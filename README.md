@@ -1,6 +1,6 @@
 * DOTNET 8.0 Version from GLTF Packer Cloned from Captain Ai
 
-Visual Studio 2022 - Windows 11 - Newtonsoft.Json 13.0.3 - Dotnet 8.0
+Visual Studio 2026 - Windows 11 Dotnet 10.0
 
 ## Disclaimer
 

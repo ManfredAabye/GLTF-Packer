@@ -23,6 +23,7 @@ namespace PBR_Material_Maker
         public Form1()
         {
             InitializeComponent();
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             #region AllowDrop on all PictureBoxes on the control.
             AllowAllPictureBoxDragDrop(Controls);
             #endregion
