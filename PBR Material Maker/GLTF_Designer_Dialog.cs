@@ -210,86 +210,37 @@ namespace PBR_Material_Maker
             string resourceData = Encoding.UTF8.GetString(Properties.Resources.pavement_03_4k_TEST2);
             JObject o = JObject.Parse(resourceData);
 
-            string gltf_output_dir = Path.Combine(Path.GetDirectoryName(pictureBoxBaseColor.ImageLocation), "gltf_textures");
-            Directory.CreateDirectory(gltf_output_dir); // Verzeichnis sicherstellen
-            string col_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_col.png");
+            // Bitmap col = new Bitmap(pictureBoxBaseColor.ImageLocation);
+
+            // Generiere alle Maps aus Albedo
             Bitmap col = new Bitmap(pictureBoxBaseColor.ImageLocation);
+            Bitmap nrm = GenerateNormalMap(col, 0.05f);
+            Bitmap bOcclusion = GenerateOcclusionMap(col);
+            Bitmap bRoughness = GenerateRoughnessMap(col);
+            Bitmap bMetallic = GenerateMetallicMap(col);
+            Bitmap emission = GenerateEmissionMap(col);
+            Bitmap alpha = GenerateAlphaMap(col);
 
-// Occlusion
-Bitmap bOcclusion = pictureBoxOcclusion.ImageLocation != null
-    ? new Bitmap(pictureBoxOcclusion.ImageLocation)
-    : GenerateSolidColor(255, 255, 255, col.Width, col.Height);
+            // Optional: Resize
+            if (resize) { nrm = ResizeImage(nrm, resizeX, resizeY); bOcclusion = ResizeImage(bOcclusion, resizeX, resizeY); bRoughness = ResizeImage(bRoughness, resizeX, resizeY); bMetallic = ResizeImage(bMetallic, resizeX, resizeY); emission = ResizeImage(emission, resizeX, resizeY); alpha = ResizeImage(alpha, resizeX, resizeY); col = ResizeImage(col, resizeX, resizeY); }
 
-// Roughness
-Bitmap bRoughness = pictureBoxRoughness.ImageLocation != null
-    ? new Bitmap(pictureBoxRoughness.ImageLocation)
-    : GenerateSolidColor(255, 255, 255, col.Width, col.Height);
-
-// Metallic
-Bitmap bMetallic = pictureBoxMetallic.ImageLocation != null
-    ? new Bitmap(pictureBoxMetallic.ImageLocation)
-    : GenerateSolidColor(255, 255, 255, col.Width, col.Height);
-
-// Normal
-string nrm_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_nrm.png");
-Bitmap nrm;
-if (pictureBoxNormal.ImageLocation != null)
-{
-    nrm = new Bitmap(pictureBoxNormal.ImageLocation);
-}
-else
-{
-    nrm = GenerateNormalMap(col, 0.05f); // 5% Prägung
-}
-if (resize) nrm = ResizeImage(nrm, resizeX, resizeY);
-nrm.Save(nrm_file_path, System.Drawing.Imaging.ImageFormat.Png);
-
-// Emission
-string emission_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_emission.png");
-if (pictureBoxEmission.ImageLocation != null)
-{
-    Bitmap emission = new Bitmap(pictureBoxEmission.ImageLocation);
-    if (resize) emission = ResizeImage(emission, resizeX, resizeY);
-    emission.Save(emission_file_path);
-    // GLTF-Referenz wie gehabt
-}
-else
-{
-    Bitmap emission = GenerateBlack(col.Width, col.Height);
-    if (resize) emission = ResizeImage(emission, resizeX, resizeY);
-    emission.Save(emission_file_path);
-    // GLTF-Referenz wie gehabt
-}
-
-// Alpha
-if (pictureBoxAlpha.ImageLocation != null)
-{
-    Bitmap alpha = new Bitmap(pictureBoxAlpha.ImageLocation);
-    col = Utils.CombineChannels(col, col, col, alpha);
-}
-            if (resize) col = ResizeImage(col, resizeX, resizeY);
-            col.Save(col_file_path, System.Drawing.Imaging.ImageFormat.Png);
-
-
-            // Occlusion speichern
-            string occ_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_occ.png");
-            if (resize) bOcclusion = ResizeImage(bOcclusion, resizeX, resizeY);
-            bOcclusion.Save(occ_file_path, System.Drawing.Imaging.ImageFormat.Png);
-
-            // Roughness speichern
-            string rough_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_rough.png");
-            if (resize) bRoughness = ResizeImage(bRoughness, resizeX, resizeY);
-            bRoughness.Save(rough_file_path, System.Drawing.Imaging.ImageFormat.Png);
-
-            // Metallic speichern
-            string metal_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_metal.png");
-            if (resize) bMetallic = ResizeImage(bMetallic, resizeX, resizeY);
-            bMetallic.Save(metal_file_path, System.Drawing.Imaging.ImageFormat.Png);
+            // Speichern
+            string gltf_output_dir = Path.Combine(Path.GetDirectoryName(pictureBoxBaseColor.ImageLocation), "gltf_textures");
+            Directory.CreateDirectory(gltf_output_dir);
+            nrm.Save(Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_nrm.png"), System.Drawing.Imaging.ImageFormat.Png);
+            bOcclusion.Save(Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_occ.png"), System.Drawing.Imaging.ImageFormat.Png);
+            bRoughness.Save(Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_rough.png"), System.Drawing.Imaging.ImageFormat.Png);
+            bMetallic.Save(Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_metal.png"), System.Drawing.Imaging.ImageFormat.Png);
+            emission.Save(Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_emission.png"), System.Drawing.Imaging.ImageFormat.Png);
+            alpha.Save(Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_alpha.png"), System.Drawing.Imaging.ImageFormat.Png);
+            col.Save(Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_col.png"), System.Drawing.Imaging.ImageFormat.Png);
 
 
             string orm_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_orm.png");
             orm_file_path = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, orm_file_path).Replace(@"\", "/").TrimStart('.');
+            string col_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_col.png");
             col_file_path = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, col_file_path).Replace(@"\", "/").TrimStart('.');
+            string nrm_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_nrm.png");
             nrm_file_path = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, nrm_file_path).Replace(@"\", "/").TrimStart('.');
 
 
@@ -314,9 +265,9 @@ if (pictureBoxAlpha.ImageLocation != null)
             if (pictureBoxEmission.ImageLocation != null)
             {
                 string emission_file_path_local = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_emission.png");
-                Bitmap emission = new Bitmap(pictureBoxEmission.ImageLocation);
-                if (resize) emission = ResizeImage(emission, resizeX, resizeY);
-                emission.Save(emission_file_path_local);
+                Bitmap emissionBmp = new Bitmap(pictureBoxEmission.ImageLocation);
+                if (resize) emissionBmp = ResizeImage(emissionBmp, resizeX, resizeY);
+                emissionBmp.Save(emission_file_path_local);
                 string emission_file_path_relative = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, emission_file_path_local).Replace(@"\", "/").TrimStart('.');
                 o["images"].Last.AddAfterSelf(JToken.FromObject(new ImageToken(emission_file_path_relative)));
                 o["textures"].Last.AddAfterSelf(JToken.FromObject(new SourceToken(3)));
@@ -480,69 +431,152 @@ if (pictureBoxAlpha.ImageLocation != null)
             return bmp;
         }
 
+        // --- Hilfsfunktionen für PBR-Generierung aus Albedo ---
+
+        // Normalmap aus Albedo (bereits vorhanden)
         private Bitmap GenerateNormalMap(Bitmap albedo, float embossStrength = 0.05f)
-{
-    int width = albedo.Width;
-    int height = albedo.Height;
-    Bitmap normalMap = new Bitmap(width, height);
-
-    // Graustufen aus Albedo
-    float[,] gray = new float[width, height];
-    for (int y = 0; y < height; y++)
-        for (int x = 0; x < width; x++)
         {
-            Color c = albedo.GetPixel(x, y);
-            gray[x, y] = (c.R + c.G + c.B) / 3f / 255f;
-        }
+            int width = albedo.Width;
+            int height = albedo.Height;
+            Bitmap normalMap = new Bitmap(width, height);
 
-    // Sobel-Operator für X/Y
-    int[,] sx = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
-    int[,] sy = { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
-
-    for (int y = 1; y < height - 1; y++)
-    {
-        for (int x = 1; x < width - 1; x++)
-        {
-            float dx = 0, dy = 0;
-            for (int ky = -1; ky <= 1; ky++)
-                for (int kx = -1; kx <= 1; kx++)
+            // Graustufen aus Albedo
+            float[,] gray = new float[width, height];
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
                 {
-                    dx += gray[x + kx, y + ky] * sx[ky + 1, kx + 1];
-                    dy += gray[x + kx, y + ky] * sy[ky + 1, kx + 1];
+                    Color c = albedo.GetPixel(x, y);
+                    gray[x, y] = (c.R + c.G + c.B) / 3f / 255f;
                 }
 
-            dx *= embossStrength;
-            dy *= embossStrength;
+            // Sobel-Operator für X/Y
+            int[,] sx = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+            int[,] sy = { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
 
-            // Normalenvektor berechnen
-            float dz = 1.0f;
-            float len = (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
-            float nx = dx / len;
-            float ny = dy / len;
-            float nz = dz / len;
+            for (int y = 1; y < height - 1; y++)
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    float dx = 0, dy = 0;
+                    for (int ky = -1; ky <= 1; ky++)
+                        for (int kx = -1; kx <= 1; kx++)
+                        {
+                            dx += gray[x + kx, y + ky] * sx[ky + 1, kx + 1];
+                            dy += gray[x + kx, y + ky] * sy[ky + 1, kx + 1];
+                        }
 
-            // In RGB umwandeln
-            int r = (int)((nx * 0.5f + 0.5f) * 255);
-            int g = (int)((ny * 0.5f + 0.5f) * 255);
-            int b = (int)((nz * 0.5f + 0.5f) * 255);
+                    dx *= embossStrength;
+                    dy *= embossStrength;
 
-            normalMap.SetPixel(x, y, Color.FromArgb(r, g, b));
+                    // Normalenvektor berechnen
+                    float dz = 1.0f;
+                    float len = (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
+                    float nx = dx / len;
+                    float ny = dy / len;
+                    float nz = dz / len;
+
+                    // In RGB umwandeln
+                    int r = (int)((nx * 0.5f + 0.5f) * 255);
+                    int g = (int)((ny * 0.5f + 0.5f) * 255);
+                    int b = (int)((nz * 0.5f + 0.5f) * 255);
+
+                    normalMap.SetPixel(x, y, Color.FromArgb(r, g, b));
+                }
+            }
+
+            // Rand auffüllen
+            for (int x = 0; x < width; x++)
+            {
+                normalMap.SetPixel(x, 0, Color.FromArgb(128, 128, 255));
+                normalMap.SetPixel(x, height - 1, Color.FromArgb(128, 128, 255));
+            }
+            for (int y = 0; y < height; y++)
+            {
+                normalMap.SetPixel(0, y, Color.FromArgb(128, 128, 255));
+                normalMap.SetPixel(width - 1, y, Color.FromArgb(128, 128, 255));
+            }
+
+            return normalMap;
         }
-    }
 
-    // Rand auffüllen
-    for (int x = 0; x < width; x++)
-    {
-        normalMap.SetPixel(x, 0, Color.FromArgb(128, 128, 255));
-        normalMap.SetPixel(x, height - 1, Color.FromArgb(128, 128, 255));
-    }
-    for (int y = 0; y < height; y++)
-    {
-        normalMap.SetPixel(0, y, Color.FromArgb(128, 128, 255));
-        normalMap.SetPixel(width - 1, y, Color.FromArgb(128, 128, 255));
-    }
+        // Occlusion aus Albedo (Helligkeit, invertiert für Schatten)
+        private Bitmap GenerateOcclusionMap(Bitmap albedo)
+        {
+            int width = albedo.Width;
+            int height = albedo.Height;
+            Bitmap occ = new Bitmap(width, height);
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                {
+                    Color c = albedo.GetPixel(x, y);
+                    int gray = 255 - (int)((c.R + c.G + c.B) / 3);
+                    occ.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
+                }
+            return occ;
+        }
 
-    return normalMap;
-}
+        // Roughness aus Albedo (Helligkeit, invertiert für rauere Flächen)
+        private Bitmap GenerateRoughnessMap(Bitmap albedo)
+        {
+            int width = albedo.Width;
+            int height = albedo.Height;
+            Bitmap rough = new Bitmap(width, height);
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                {
+                    Color c = albedo.GetPixel(x, y);
+                    int gray = 255 - (int)((c.R + c.G + c.B) / 3);
+                    rough.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
+                }
+            return rough;
+        }
+
+        // Metallic aus Albedo (Helligkeit, optional Schwellenwert)
+        private Bitmap GenerateMetallicMap(Bitmap albedo, int threshold = 200)
+        {
+            int width = albedo.Width;
+            int height = albedo.Height;
+            Bitmap metal = new Bitmap(width, height);
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                {
+                    Color c = albedo.GetPixel(x, y);
+                    int gray = (c.R + c.G + c.B) / 3;
+                    int value = gray > threshold ? 255 : 0;
+                    metal.SetPixel(x, y, Color.FromArgb(value, value, value));
+                }
+            return metal;
+        }
+
+        // Emission aus Albedo (optional: Helligkeit, hier einfach übernommen)
+        private Bitmap GenerateEmissionMap(Bitmap albedo)
+        {
+            int width = albedo.Width;
+            int height = albedo.Height;
+            Bitmap emission = new Bitmap(width, height);
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                {
+                    Color c = albedo.GetPixel(x, y);
+                    emission.SetPixel(x, y, c);
+                }
+            return emission;
+        }
+
+        // Alpha aus Albedo (optional: Helligkeit, hier voll transparent)
+        private Bitmap GenerateAlphaMap(Bitmap albedo)
+        {
+            int width = albedo.Width;
+            int height = albedo.Height;
+            Bitmap alpha = new Bitmap(width, height);
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                {
+                    Color c = albedo.GetPixel(x, y);
+                    int a = 255; // oder z.B. (c.R + c.G + c.B) / 3 für Helligkeit
+                    alpha.SetPixel(x, y, Color.FromArgb(a, c.R, c.G, c.B));
+                }
+            return alpha;
+        }
     }
 }
