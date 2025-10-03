@@ -214,9 +214,9 @@ namespace PBR_Material_Maker
 
             // Generiere alle Maps aus Albedo
             Bitmap col = new Bitmap(pictureBoxBaseColor.ImageLocation);
-            Bitmap nrm = GenerateNormalMap(col, 0.05f);
+            Bitmap nrm = GenerateNormalMap(col, 0.20f);
             Bitmap bOcclusion = GenerateOcclusionMap(col);
-            Bitmap bRoughness = GenerateRoughnessMap(col);
+            Bitmap bRoughness = GenerateRoughnessMap(col, 0.20f);
             Bitmap bMetallic = GenerateMetallicMap(col);
             Bitmap emission = GenerateEmissionMap(col);
             Bitmap alpha = GenerateAlphaMap(col);
@@ -516,7 +516,7 @@ namespace PBR_Material_Maker
         }
 
         // Roughness aus Albedo (Helligkeit, invertiert für rauere Flächen)
-        private Bitmap GenerateRoughnessMap(Bitmap albedo)
+        private Bitmap GenerateRoughnessMap(Bitmap albedo, float effectStrength = 0.20f)
         {
             int width = albedo.Width;
             int height = albedo.Height;
@@ -525,7 +525,7 @@ namespace PBR_Material_Maker
                 for (int x = 0; x < width; x++)
                 {
                     Color c = albedo.GetPixel(x, y);
-                    int gray = 255 - (int)((c.R + c.G + c.B) / 3);
+                    int gray = 255 - (int)(((c.R + c.G + c.B) / 3) * effectStrength);
                     rough.SetPixel(x, y, Color.FromArgb(gray, gray, gray));
                 }
             return rough;
