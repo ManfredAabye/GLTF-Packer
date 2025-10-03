@@ -1,4 +1,4 @@
-# DOTNET 10.0 Version von GLTF Packer (Fork von Captain Ai)
+﻿# DOTNET 10.0 Version von GLTF Packer (Fork von Captain Ai)
 
 Visual Studio 2026 – Windows 11 – .NET 10.0
 
