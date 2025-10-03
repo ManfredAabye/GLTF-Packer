@@ -11,6 +11,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PBR_Material_Maker
@@ -145,7 +146,7 @@ namespace PBR_Material_Maker
             buttonSave.Enabled = pictureBoxBaseColor.ImageLocation != null;
         }
 
-        private void ButtonSave_Click(object sender, EventArgs e)
+        private async void ButtonSave_Click(object sender, EventArgs e)
         {
             if (pictureBoxBaseColor.ImageLocation == null)
             {
@@ -210,62 +211,83 @@ namespace PBR_Material_Maker
             JObject o = JObject.Parse(resourceData);
 
             string gltf_output_dir = Path.Combine(Path.GetDirectoryName(pictureBoxBaseColor.ImageLocation), "gltf_textures");
+            Directory.CreateDirectory(gltf_output_dir); // Verzeichnis sicherstellen
             string col_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_col.png");
             Bitmap col = new Bitmap(pictureBoxBaseColor.ImageLocation);
 
-            Bitmap bOcclusion;
-            Bitmap bRoughness;
-            Bitmap bMetallic;
-            if (pictureBoxOcclusion.ImageLocation != null)
-            {
-                bOcclusion = new Bitmap(pictureBoxOcclusion.ImageLocation);
-            }
-            else
-            {
-                bOcclusion = Utils.GenerateSolidColor(255, 255, 255);
-            }
-            if (pictureBoxRoughness.ImageLocation != null)
-            {
-                bRoughness = new Bitmap(pictureBoxRoughness.ImageLocation);
-            }
-            else
-            {
-                bRoughness = Utils.GenerateSolidColor(255, 255, 255);
-            }
-            if (pictureBoxMetallic.ImageLocation != null)
-            {
-                bMetallic = new Bitmap(pictureBoxMetallic.ImageLocation);
-                o["materials"][0]["pbrMetallicRoughness"]["metallicFactor"] = 1.0f;
-            }
-            else
-            {
-                bMetallic = Utils.GenerateSolidColor(255, 255, 255);
-                o["materials"][0]["pbrMetallicRoughness"]["metallicFactor"] = 0.0f;
-            }
+// Occlusion
+Bitmap bOcclusion = pictureBoxOcclusion.ImageLocation != null
+    ? new Bitmap(pictureBoxOcclusion.ImageLocation)
+    : GenerateSolidColor(255, 255, 255, col.Width, col.Height);
 
+// Roughness
+Bitmap bRoughness = pictureBoxRoughness.ImageLocation != null
+    ? new Bitmap(pictureBoxRoughness.ImageLocation)
+    : GenerateSolidColor(255, 255, 255, col.Width, col.Height);
 
-            Directory.CreateDirectory(gltf_output_dir);
-            string orm_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_orm.png");
-            Bitmap orm = Utils.CombineChannels(bOcclusion, bRoughness, bMetallic, col.Width, col.Height);
-            if (resize) orm = ResizeImage(orm, resizeX, resizeY);
-            orm.Save(orm_file_path, System.Drawing.Imaging.ImageFormat.Png);
+// Metallic
+Bitmap bMetallic = pictureBoxMetallic.ImageLocation != null
+    ? new Bitmap(pictureBoxMetallic.ImageLocation)
+    : GenerateSolidColor(255, 255, 255, col.Width, col.Height);
 
-            if (pictureBoxAlpha.ImageLocation != null)
-            {
-                Bitmap alpha = new Bitmap(pictureBoxAlpha.ImageLocation);
-                col = Utils.CombineChannels(col, col, col, alpha);
-            }
+// Normal
+string nrm_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_nrm.png");
+Bitmap nrm;
+if (pictureBoxNormal.ImageLocation != null)
+{
+    nrm = new Bitmap(pictureBoxNormal.ImageLocation);
+}
+else
+{
+    nrm = GenerateNormalMap(col, 0.05f); // 5% Prägung
+}
+if (resize) nrm = ResizeImage(nrm, resizeX, resizeY);
+nrm.Save(nrm_file_path, System.Drawing.Imaging.ImageFormat.Png);
+
+// Emission
+string emission_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_emission.png");
+if (pictureBoxEmission.ImageLocation != null)
+{
+    Bitmap emission = new Bitmap(pictureBoxEmission.ImageLocation);
+    if (resize) emission = ResizeImage(emission, resizeX, resizeY);
+    emission.Save(emission_file_path);
+    // GLTF-Referenz wie gehabt
+}
+else
+{
+    Bitmap emission = GenerateBlack(col.Width, col.Height);
+    if (resize) emission = ResizeImage(emission, resizeX, resizeY);
+    emission.Save(emission_file_path);
+    // GLTF-Referenz wie gehabt
+}
+
+// Alpha
+if (pictureBoxAlpha.ImageLocation != null)
+{
+    Bitmap alpha = new Bitmap(pictureBoxAlpha.ImageLocation);
+    col = Utils.CombineChannels(col, col, col, alpha);
+}
             if (resize) col = ResizeImage(col, resizeX, resizeY);
             col.Save(col_file_path, System.Drawing.Imaging.ImageFormat.Png);
 
-            string nrm_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_nrm.png");
-            if (pictureBoxNormal.ImageLocation != null)
-            {
-                Bitmap nrm = new Bitmap(pictureBoxNormal.ImageLocation);
-                if (resize) nrm = ResizeImage(nrm, resizeX, resizeY);
-                nrm.Save(nrm_file_path, System.Drawing.Imaging.ImageFormat.Png);
-            }
 
+            // Occlusion speichern
+            string occ_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_occ.png");
+            if (resize) bOcclusion = ResizeImage(bOcclusion, resizeX, resizeY);
+            bOcclusion.Save(occ_file_path, System.Drawing.Imaging.ImageFormat.Png);
+
+            // Roughness speichern
+            string rough_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_rough.png");
+            if (resize) bRoughness = ResizeImage(bRoughness, resizeX, resizeY);
+            bRoughness.Save(rough_file_path, System.Drawing.Imaging.ImageFormat.Png);
+
+            // Metallic speichern
+            string metal_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_metal.png");
+            if (resize) bMetallic = ResizeImage(bMetallic, resizeX, resizeY);
+            bMetallic.Save(metal_file_path, System.Drawing.Imaging.ImageFormat.Png);
+
+
+            string orm_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_orm.png");
             orm_file_path = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, orm_file_path).Replace(@"\", "/").TrimStart('.');
             col_file_path = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, col_file_path).Replace(@"\", "/").TrimStart('.');
             nrm_file_path = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, nrm_file_path).Replace(@"\", "/").TrimStart('.');
@@ -291,12 +313,12 @@ namespace PBR_Material_Maker
 
             if (pictureBoxEmission.ImageLocation != null)
             {
-                string emission_file_path = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_emission.png");
+                string emission_file_path_local = Path.Combine(gltf_output_dir, textBoxMaterialName.Text + "_emission.png");
                 Bitmap emission = new Bitmap(pictureBoxEmission.ImageLocation);
                 if (resize) emission = ResizeImage(emission, resizeX, resizeY);
-                emission.Save(emission_file_path);
-                emission_file_path = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, emission_file_path).Replace(@"\", "/").TrimStart('.');
-                o["images"].Last.AddAfterSelf(JToken.FromObject(new ImageToken(emission_file_path)));
+                emission.Save(emission_file_path_local);
+                string emission_file_path_relative = Utils.GetRelativePath(pictureBoxBaseColor.ImageLocation, emission_file_path_local).Replace(@"\", "/").TrimStart('.');
+                o["images"].Last.AddAfterSelf(JToken.FromObject(new ImageToken(emission_file_path_relative)));
                 o["textures"].Last.AddAfterSelf(JToken.FromObject(new SourceToken(3)));
                 o["materials"][0]["emissiveTexture"] = JToken.FromObject(new IndexToken(3));
                 float[] emissiveFactor = new float[] { 1.0f, 1.0f, 1.0f };
@@ -317,7 +339,7 @@ namespace PBR_Material_Maker
             UseWaitCursor = false;
             buttonSave.Text = "Saved!";
             this.Refresh();
-            Thread.Sleep(3000);
+            await Task.Delay(3000);
             Enabled = true;
             buttonSave.Text = txtBefore;
         }
@@ -426,5 +448,101 @@ namespace PBR_Material_Maker
                 comboBoxResolution.DropDownStyle = ComboBoxStyle.DropDownList;
             }
         }
+
+        private Bitmap GenerateSolidColor(byte r, byte g, byte b, int width, int height)
+        {
+            Bitmap bmp = new Bitmap(width, height);
+            using (Graphics gfx = Graphics.FromImage(bmp))
+            {
+                gfx.Clear(Color.FromArgb(r, g, b));
+            }
+            return bmp;
+        }
+
+        private Bitmap GenerateFlatNormal(int width, int height)
+        {
+            Bitmap bmp = new Bitmap(width, height);
+            using (Graphics gfx = Graphics.FromImage(bmp))
+            {
+                // Ein flaches Normal-Map-Bild: RGB(128,128,255) = Vektor (0,0,1)
+                gfx.Clear(Color.FromArgb(128, 128, 255));
+            }
+            return bmp;
+        }
+
+        private Bitmap GenerateBlack(int width, int height)
+        {
+            Bitmap bmp = new Bitmap(width, height);
+            using (Graphics gfx = Graphics.FromImage(bmp))
+            {
+                gfx.Clear(Color.Black);
+            }
+            return bmp;
+        }
+
+        private Bitmap GenerateNormalMap(Bitmap albedo, float embossStrength = 0.05f)
+{
+    int width = albedo.Width;
+    int height = albedo.Height;
+    Bitmap normalMap = new Bitmap(width, height);
+
+    // Graustufen aus Albedo
+    float[,] gray = new float[width, height];
+    for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++)
+        {
+            Color c = albedo.GetPixel(x, y);
+            gray[x, y] = (c.R + c.G + c.B) / 3f / 255f;
+        }
+
+    // Sobel-Operator für X/Y
+    int[,] sx = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+    int[,] sy = { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+
+    for (int y = 1; y < height - 1; y++)
+    {
+        for (int x = 1; x < width - 1; x++)
+        {
+            float dx = 0, dy = 0;
+            for (int ky = -1; ky <= 1; ky++)
+                for (int kx = -1; kx <= 1; kx++)
+                {
+                    dx += gray[x + kx, y + ky] * sx[ky + 1, kx + 1];
+                    dy += gray[x + kx, y + ky] * sy[ky + 1, kx + 1];
+                }
+
+            dx *= embossStrength;
+            dy *= embossStrength;
+
+            // Normalenvektor berechnen
+            float dz = 1.0f;
+            float len = (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
+            float nx = dx / len;
+            float ny = dy / len;
+            float nz = dz / len;
+
+            // In RGB umwandeln
+            int r = (int)((nx * 0.5f + 0.5f) * 255);
+            int g = (int)((ny * 0.5f + 0.5f) * 255);
+            int b = (int)((nz * 0.5f + 0.5f) * 255);
+
+            normalMap.SetPixel(x, y, Color.FromArgb(r, g, b));
+        }
+    }
+
+    // Rand auffüllen
+    for (int x = 0; x < width; x++)
+    {
+        normalMap.SetPixel(x, 0, Color.FromArgb(128, 128, 255));
+        normalMap.SetPixel(x, height - 1, Color.FromArgb(128, 128, 255));
+    }
+    for (int y = 0; y < height; y++)
+    {
+        normalMap.SetPixel(0, y, Color.FromArgb(128, 128, 255));
+        normalMap.SetPixel(width - 1, y, Color.FromArgb(128, 128, 255));
+    }
+
+    return normalMap;
+}
     }
 }
