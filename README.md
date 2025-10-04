@@ -1,35 +1,125 @@
-﻿# DOTNET 10.0 Version von GLTF Packer (Fork von Captain Ai)
+﻿# GLTF Packer
 
-Visual Studio 2026 – Windows 11 – .NET 10.0
+**Version:** 2.2.64  
+**Target:** .NET 10 (Windows Forms & WPF)  
+**Plattform:** Windows 7.0 und neuer
 
-Diese Version erstellt automatisch nicht vorhandene PBR-Bestandteile (BaseColor, Normal, Occlusion, Roughness, Metallic, Emission, Alpha) und speichert sie im Zielverzeichnis. Die Normalmap wird aus der Albedo berechnet und erhält eine leichte Prägung (Standard: 5 %).
+## Beschreibung
+
+GLTF Packer ist ein Tool zum Packen von Texturen und Erstellen von GLTF-Dateien für PBR-Materialien.  
+Es unterstützt das Laden, Bearbeiten und Exportieren von Texturen wie Base Color, Occlusion, Roughness, Metallic, Normal, Emission und Alpha.
 
 ## Features
 
-- Automatische Erzeugung fehlender PBR-Texturen (weiß/schwarz oder generiert)
-- Normalmap-Generierung aus Albedo mit Prägung
-- Unterstützung für Drag & Drop von Texturen
-- Anpassbare Auflösung für alle Maps
-- GLTF-Export mit allen relevanten Textur-Referenzen
-- Kompatibel mit Windows 11 und Visual Studio 2026 (.NET 10.0)
+- Unterstützung für alle gängigen PBR-Texturtypen
+- Automatisches Erkennen und Zuordnen von Texturdateien
+- Bildgrößenanpassung (Resize) mit verschiedenen Auflösungen
+- Export als GLTF 2.0 mit korrekten Texturpfaden
+- Emission, Alpha und weitere Spezialmaps werden unterstützt
+- Kompatibel mit SecondLife und anderen Plattformen
+
+## Systemvoraussetzungen
+
+- Windows 7 oder neuer
+- .NET 10 Desktop Runtime
+- Keine Installation erforderlich, einfach ausführbar
 
 ## Installation
 
-1. Projekt mit Visual Studio 2026 öffnen.
-2. Abhängigkeiten installieren (NuGet: Newtonsoft.Json).
-3. Anwendung kompilieren und starten.
+1. Repository herunterladen oder Release aus den GitHub-Releases beziehen.
+2. Die Datei `GLTF Packer.exe` ausführen.
 
-## Verwendung
+## Nutzung
 
-1. Ziehe die gewünschte Albedo-Textur per Drag & Drop in das Fenster.
-2. Weitere Maps werden automatisch erkannt oder generiert.
-3. Wähle die gewünschte Auflösung.
-4. Klicke auf „Save“, um die GLTF-Datei und alle Texturen zu exportieren.
+1. Texturen per Drag & Drop in die jeweiligen Felder ziehen.
+2. Materialnamen vergeben.
+3. Auflösung wählen (optional).
+4. Mit **Save** die GLTF-Datei und Texturen exportieren.
 
-## Disclaimer
+## Konfiguration
 
-GLTF Packer steht in keiner Verbindung zu KhronosGroup, glTF, Linden Lab, SecondLife oder OpenSim. Es handelt sich um Drittanbieter-Software.
+- Die Datei `material.json` wird beim ersten Start automatisch mit Standardwerten angelegt.
+- Anpassungen können direkt in der Datei vorgenommen werden.
+
+
+### Einstellmöglichkeiten
+
+| Schlüssel            | Typ            | Beschreibung                                                                                 | Beispielwert         |
+|----------------------|----------------|---------------------------------------------------------------------------------------------|----------------------|
+| NormalStrength       | Zahl (float)   | Stärke des Normalmap-Effekts (Kantenprägung)                                                | 0.2                  |
+| RoughnessStrength    | Zahl (float)   | Stärke des Roughness-Effekts (Rauheit)                                                      | 0.2                  |
+| OcclusionStrength    | Zahl (float)   | Stärke des Occlusion-Effekts (Schatten)                                                     | 1.0                  |
+| MetallicThreshold    | Zahl (int)     | Schwellenwert für Metallizität (ab welchem Grauwert als Metall interpretiert wird)           | 200                  |
+| EmissionStrength     | Zahl (float)   | Stärke des Emissions-Effekts                                                                | 1.0                  |
+| AlphaStrength        | Zahl (float)   | Stärke des Alpha-Kanals                                                                     | 1.0                  |
+| BaseColorTint        | Array (float)  | Farb-Tint für Base Color (RGB-Multiplikatoren, z.B. [1.0, 0.8, 0.8] für rötlicheres Material)| [1.0, 1.0, 1.0]      |
+| NormalMapType        | String         | Typ der Normalmap-Generierung ("sobel" für Kantenerkennung, "flat" für flache Map)           | "sobel"              |
+| RoughnessInvert      | Boolean        | Roughness invertieren (true/false)                                                          | false                |
+| MetallicIntensity    | Zahl (float)   | Intensität des Metall-Effekts                                                               | 1.0                  |
+| EmissionColor        | Array (float)  | Farbe der Emission (RGB, z.B. [1.0, 1.0, 0.0] für gelb)                                     | [1.0, 1.0, 1.0]      |
+| AlphaMode            | String         | Alpha-Modus ("opaque", "mask", "blend")                                                     | "opaque"             |
+
+### Anpassung
+
+- Öffne die Datei `material.json` mit einem Texteditor.
+- Ändere die Werte nach Bedarf, z.B.:
+
+  - **NormalStrength**  
+    `"NormalStrength": 0.5`  
+    Erhöht die Prägung der Normalmap (Kanten werden stärker hervorgehoben).
+
+  - **RoughnessStrength**  
+    `"RoughnessStrength": 0.8`  
+    Material wirkt rauer, weniger glänzend.
+
+  - **OcclusionStrength**  
+    `"OcclusionStrength": 0.5`  
+    Weniger starke Schatten, Material wirkt heller.
+
+  - **MetallicThreshold**  
+    `"MetallicThreshold": 100`  
+    Bereits hellere Bereiche werden als Metall interpretiert.
+
+  - **EmissionStrength**  
+    `"EmissionStrength": 2.0`  
+    Material leuchtet stärker.
+
+  - **AlphaStrength**  
+    `"AlphaStrength": 0.5`  
+    Material wird halbtransparent.
+
+  - **BaseColorTint**  
+    `"BaseColorTint": [1.0, 0.7, 0.7]`  
+    Material erhält einen rötlichen Farbton.
+
+  - **NormalMapType**  
+    `"NormalMapType": "flat"`  
+    Erzeugt eine flache Normalmap ohne Kantenerkennung.
+
+  - **RoughnessInvert**  
+    `"RoughnessInvert": true`  
+    Invertiert die Rauheit, helle Bereiche werden rau, dunkle glatt.
+
+  - **MetallicIntensity**  
+    `"MetallicIntensity": 0.5`  
+    Metall-Effekt wird abgeschwächt.
+
+  - **EmissionColor**  
+    `"EmissionColor": [1.0, 1.0, 0.0]`  
+    Material leuchtet gelb.
+
+  - **AlphaMode**  
+    `"AlphaMode": "blend"`  
+    Material wird transparent dargestellt.  
+    `"AlphaMode": "mask"` für Maskierung.  
+    `"AlphaMode": "opaque"` für undurchsichtiges Material.
+
+**Hinweis:**  
+Nach dem Speichern der Änderungen die Anwendung neu starten, damit die neuen Einstellungen übernommen werden.
 
 ## Lizenz
 
-Siehe LICENSE-Datei im Repository.
+Dieses Projekt steht unter der MIT-Lizenz.
+
+---
+
