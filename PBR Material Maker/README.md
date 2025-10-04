@@ -12,6 +12,21 @@ Dieses Projekt ist ein GLTF-Packer für PBR-Materialien. Es ermöglicht das Drag &
 - Unterstützt .NET 10 und C# 14.0
 - WPF-Oberfläche
 
+## Konfiguration: material.json
+
+Die Datei `material.json` erlaubt die Anpassung der Effektstärken für die Generierung der Maps. Die Werte können wie folgt eingestellt werden:
+
+| Parameter           | Minimalwert | Maximalwert | Beschreibung                                      |
+|---------------------|-------------|-------------|---------------------------------------------------|
+| NormalStrength      | 0.0         | 1.0         | Stärke der Prägung/Normalmap                      |
+| RoughnessStrength   | 0.0         | 1.0         | Stärke der Rauheit                                |
+| OcclusionStrength   | 0.0         | 1.0         | Stärke der Schatten/Occlusion                     |
+| MetallicThreshold   | 0           | 255         | Schwellenwert für Metallisch                      |
+| EmissionStrength    | 0.0         | 1.0         | Stärke der Emission                               |
+| AlphaStrength       | 0.0         | 1.0         | Stärke der Transparenz/Alpha                      |
+
+**Hinweis:** Werte außerhalb des Bereichs können zu unerwarteten Ergebnissen führen.
+
 ## Bedienung
 
 1. Ziehe eine Textur auf das entsprechende Feld.

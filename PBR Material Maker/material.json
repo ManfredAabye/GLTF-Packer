@@ -1,0 +1,14 @@
+{
+  "NormalStrength": 0.20,
+  "RoughnessStrength": 0.20,
+  "OcclusionStrength": 1.0,
+  "MetallicThreshold": 200,
+  "EmissionStrength": 1.0,
+  "AlphaStrength": 1.0,
+  "BaseColorTint": [1.0, 1.0, 1.0],
+  "NormalMapType": "sobel",
+  "RoughnessInvert": false,
+  "MetallicIntensity": 0.8,
+  "EmissionColor": [1.0, 1.0, 1.0],
+  "AlphaMode": "opaque"
+}
