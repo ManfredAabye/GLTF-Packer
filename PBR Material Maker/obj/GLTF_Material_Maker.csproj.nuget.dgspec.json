@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\GLTF-Packer\\PBR Material Maker\\GLTF_Material_Maker.csproj": {}
+    "D:\\GLTF-Packer\\GLTF-Packer\\PBR Material Maker\\GLTF_Material_Maker.csproj": {}
   },
   "projects": {
-    "D:\\GLTF-Packer\\PBR Material Maker\\GLTF_Material_Maker.csproj": {
+    "D:\\GLTF-Packer\\GLTF-Packer\\PBR Material Maker\\GLTF_Material_Maker.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\GLTF-Packer\\PBR Material Maker\\GLTF_Material_Maker.csproj",
+        "projectUniqueName": "D:\\GLTF-Packer\\GLTF-Packer\\PBR Material Maker\\GLTF_Material_Maker.csproj",
         "projectName": "GLTF Packer",
-        "projectPath": "D:\\GLTF-Packer\\PBR Material Maker\\GLTF_Material_Maker.csproj",
+        "projectPath": "D:\\GLTF-Packer\\GLTF-Packer\\PBR Material Maker\\GLTF_Material_Maker.csproj",
         "packagesPath": "C:\\Users\\zainh\\.nuget\\packages\\",
-        "outputPath": "D:\\GLTF-Packer\\PBR Material Maker\\obj\\",
+        "outputPath": "D:\\GLTF-Packer\\GLTF-Packer\\PBR Material Maker\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

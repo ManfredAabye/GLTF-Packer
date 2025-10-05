@@ -13,11 +13,11 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("GLTF Packer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("2.2.64.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.2.64+6a4a23b8964bd325d096f0889edc4e17770bca7b")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("2.3.96.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.3.96+87243762e963d9e4a10c223a40d7b468f7d49d8a")]
 [assembly: System.Reflection.AssemblyProductAttribute("GLTF Packer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GLTF Packer")]
-[assembly: System.Reflection.AssemblyVersionAttribute("2.2.64.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("2.3.96.0")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]
 
