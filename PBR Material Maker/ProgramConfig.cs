@@ -5,7 +5,7 @@ namespace PBR_Material_Maker
     public class ProgramConfig
     {
         [JsonProperty]
-        public int WindowHeight = 1030;
+        public int WindowHeight = 1080;
 
     }
 }

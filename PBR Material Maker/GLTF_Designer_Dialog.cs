@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -16,20 +17,22 @@ using System.Windows.Forms;
 
 namespace PBR_Material_Maker
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         bool dropValid = false;
         string dropFilename;
         private dynamic materialConfig;
+        private TextBox textBoxMaterialName;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            // Entferne alle manuellen Änderungen an Fenstergröße und Layout
+            // Die Fenstergröße und Skalierung werden ausschließlich im Designer gesetzt!
+
             #region AllowDrop on all PictureBoxes on the control.
             AllowAllPictureBoxDragDrop(Controls);
             #endregion
-            TopMost = true;
 
             Version appVersion = Assembly.GetExecutingAssembly().GetName().Version;
             labelVersion.Text = appVersion.Major + "." + appVersion.Minor + "." + appVersion.Build;
@@ -57,6 +60,44 @@ namespace PBR_Material_Maker
             {
                 materialConfig = defaultConfig;
                 File.WriteAllText("material.json", JsonConvert.SerializeObject(defaultConfig, Formatting.Indented));
+            }
+
+            if (materialConfig.Materials != null)
+            {
+                comboBoxMaterialSelect.Items.Clear();
+                foreach (var mat in materialConfig.Materials)
+                {
+                    comboBoxMaterialSelect.Items.Add((string)mat.MaterialName);
+                }
+                comboBoxMaterialSelect.SelectedIndex = 0;
+            }
+            comboBoxMaterialSelect.SelectedIndexChanged += ComboBoxMaterialSelect_SelectedIndexChanged;
+
+            // ToolTips für alle relevanten Controls setzen
+            toolTip1.SetToolTip(comboBoxMaterialSelect, "Wähle ein Material-Preset aus.");
+            toolTip1.SetToolTip(textBoxMaterialName, "Materialname für die Texturen und GLTF-Datei.");
+            toolTip1.SetToolTip(comboBoxResolution, "Wähle die Zielauflösung für die Texturen.");
+
+            // Nach dem Befüllen der ComboBox das gewünschte Material auswählen und anzeigen:
+            if (comboBoxMaterialSelect.Items.Count > 0)
+            {
+                int idx = comboBoxMaterialSelect.Items.IndexOf("StandardPBR");
+                comboBoxMaterialSelect.SelectedIndex = idx >= 0 ? idx : 0;
+                ComboBoxMaterialSelect_SelectedIndexChanged(comboBoxMaterialSelect, EventArgs.Empty);
+                // ComboBox-Text explizit setzen, damit "StandardPBR" angezeigt wird:
+                comboBoxMaterialSelect.Text = comboBoxMaterialSelect.SelectedItem?.ToString();
+            }
+
+            if (textBoxMaterialName == null)
+            {
+                textBoxMaterialName = new TextBox();
+                textBoxMaterialName.BackColor = SystemColors.ControlDarkDark;
+                textBoxMaterialName.Location = new Point(13, 847);
+                textBoxMaterialName.Name = "textBoxMaterialName";
+                textBoxMaterialName.Size = new Size(96, 23);
+                textBoxMaterialName.TabIndex = 20;
+                toolTip1.SetToolTip(textBoxMaterialName, "Material Name.\r\nAs shown in SecondLife.");
+                this.Controls.Add(textBoxMaterialName);
             }
         }
 
@@ -253,11 +294,15 @@ namespace PBR_Material_Maker
             Bitmap col = new Bitmap(pictureBoxBaseColor.ImageLocation);
 
             // Neue Felder auslesen
-            float[] baseColorTint = materialConfig.BaseColorTint ?? new float[] { 1.0f, 1.0f, 1.0f };
+            float[] baseColorTint = (materialConfig.BaseColorTint is JArray jarr)
+                ? jarr.ToObject<float[]>()
+                : (materialConfig.BaseColorTint ?? new float[] { 1.0f, 1.0f, 1.0f });
             string normalMapType = materialConfig.NormalMapType ?? "sobel";
             bool roughnessInvert = materialConfig.RoughnessInvert ?? false;
             float metallicIntensity = materialConfig.MetallicIntensity ?? 1.0f;
-            float[] emissionColor = materialConfig.EmissionColor ?? new float[] { 1.0f, 1.0f, 1.0f };
+            float[] emissionColor = (materialConfig.EmissionColor is JArray emissionJarr)
+                ? emissionJarr.ToObject<float[]>()
+                : (materialConfig.EmissionColor ?? new float[] { 1.0f, 1.0f, 1.0f });
             string alphaMode = materialConfig.AlphaMode ?? "opaque";
 
             // BaseColorTint anwenden
@@ -443,13 +488,13 @@ namespace PBR_Material_Maker
         {
             if (this.Height == 1030)
             {
-                this.MinimumSize = new Size(140, 400);
-                this.MaximumSize = new Size(140, 1030);
+                this.MinimumSize = new Size(140, 1080);
+                this.MaximumSize = new Size(140, 1280);
             }
             else
             {
-                this.MinimumSize = new Size(150, 400);
-                this.MaximumSize = new Size(150, 1030);
+                this.MinimumSize = new Size(150, 1080);
+                this.MaximumSize = new Size(150, 1280);
             }
         }
 
@@ -461,6 +506,7 @@ namespace PBR_Material_Maker
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            LoadMaterialPresets();
             var cfg = Program.ProgramConfig;
             Height = cfg.WindowHeight;
         }
@@ -697,6 +743,61 @@ namespace PBR_Material_Maker
                     bitmap.SetPixel(x, y, Color.FromArgb(r, g, b));
                 }
             }
+        }
+
+        private void ComboBoxMaterialSelect_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int idx = comboBoxMaterialSelect.SelectedIndex;
+            if (idx >= 0 && materialConfig.Materials != null)
+            {
+                var selectedMat = materialConfig.Materials[idx];
+                materialConfig.NormalStrength = selectedMat.NormalStrength;
+                materialConfig.RoughnessStrength = selectedMat.RoughnessStrength;
+                materialConfig.OcclusionStrength = selectedMat.OcclusionStrength;
+                materialConfig.MetallicThreshold = selectedMat.MetallicThreshold;
+                materialConfig.EmissionStrength = selectedMat.EmissionStrength;
+                materialConfig.AlphaStrength = selectedMat.AlphaStrength;
+                materialConfig.BaseColorTint = selectedMat.BaseColorTint;
+                materialConfig.NormalMapType = selectedMat.NormalMapType;
+                materialConfig.RoughnessInvert = selectedMat.RoughnessInvert;
+                materialConfig.MetallicIntensity = selectedMat.MetallicIntensity;
+                materialConfig.EmissionColor = selectedMat.EmissionColor;
+                materialConfig.AlphaMode = selectedMat.AlphaMode;
+                // Optional: UI aktualisieren, falls Werte angezeigt werden
+            }
+        }
+
+        private void CheckBoxMaterialSelect_CheckedChanged(object sender, EventArgs e)
+        {
+            // Beispiel: Aktivieren/Deaktivieren der Materialauswahl
+            comboBoxMaterialSelect.Enabled = checkBoxMaterialSelect.Checked;
+        }
+
+        // Fügen Sie dies in MainForm ein, z.B. in Form1_Load oder einer passenden Initialisierungsmethode.
+        private void LoadMaterialPresets()
+        {
+            string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "material.json");
+            if (!File.Exists(jsonPath))
+                return;
+
+            string json = File.ReadAllText(jsonPath);
+            dynamic config = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+
+            comboBoxMaterialSelect.Items.Clear();
+            if (config.Materials != null)
+            {
+                foreach (var mat in config.Materials)
+                {
+                    comboBoxMaterialSelect.Items.Add((string)mat.MaterialName);
+                }
+            }
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            // Keine manuelle Positionierung mehr!
+            // Das Layout wird durch das Panel und die Designer-Einstellungen gesteuert.
         }
     }
 }
