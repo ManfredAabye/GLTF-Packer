@@ -1,125 +1,103 @@
-﻿# GLTF Packer
+# PBR Material Maker
 
-**Version:** 2.2.64  
-**Target:** .NET 10 (Windows Forms & WPF)  
-**Plattform:** Windows 7.0 und neuer
-
-## Beschreibung
-
-GLTF Packer ist ein Tool zum Packen von Texturen und Erstellen von GLTF-Dateien für PBR-Materialien.  
-Es unterstützt das Laden, Bearbeiten und Exportieren von Texturen wie Base Color, Occlusion, Roughness, Metallic, Normal, Emission und Alpha.
-
-## Features
-
-- Unterstützung für alle gängigen PBR-Texturtypen
-- Automatisches Erkennen und Zuordnen von Texturdateien
-- Bildgrößenanpassung (Resize) mit verschiedenen Auflösungen
-- Export als GLTF 2.0 mit korrekten Texturpfaden
-- Emission, Alpha und weitere Spezialmaps werden unterstützt
-- Kompatibel mit SecondLife und anderen Plattformen
-
-## Systemvoraussetzungen
-
-- Windows 7 oder neuer
-- .NET 10 Desktop Runtime
-- Keine Installation erforderlich, einfach ausführbar
-
-## Installation
-
-1. Repository herunterladen oder Release aus den GitHub-Releases beziehen.
-2. Die Datei `GLTF Packer.exe` ausführen.
-
-## Nutzung
-
-1. Texturen per Drag & Drop in die jeweiligen Felder ziehen.
-2. Materialnamen vergeben.
-3. Auflösung wählen (optional).
-4. Mit **Save** die GLTF-Datei und Texturen exportieren.
-
-## Konfiguration
-
-- Die Datei `material.json` wird beim ersten Start automatisch mit Standardwerten angelegt.
-- Anpassungen können direkt in der Datei vorgenommen werden.
-
-
-### Einstellmöglichkeiten
-
-| Schlüssel            | Typ            | Beschreibung                                                                                 | Beispielwert         |
-|----------------------|----------------|---------------------------------------------------------------------------------------------|----------------------|
-| NormalStrength       | Zahl (float)   | Stärke des Normalmap-Effekts (Kantenprägung)                                                | 0.2                  |
-| RoughnessStrength    | Zahl (float)   | Stärke des Roughness-Effekts (Rauheit)                                                      | 0.2                  |
-| OcclusionStrength    | Zahl (float)   | Stärke des Occlusion-Effekts (Schatten)                                                     | 1.0                  |
-| MetallicThreshold    | Zahl (int)     | Schwellenwert für Metallizität (ab welchem Grauwert als Metall interpretiert wird)           | 200                  |
-| EmissionStrength     | Zahl (float)   | Stärke des Emissions-Effekts                                                                | 1.0                  |
-| AlphaStrength        | Zahl (float)   | Stärke des Alpha-Kanals                                                                     | 1.0                  |
-| BaseColorTint        | Array (float)  | Farb-Tint für Base Color (RGB-Multiplikatoren, z.B. [1.0, 0.8, 0.8] für rötlicheres Material)| [1.0, 1.0, 1.0]      |
-| NormalMapType        | String         | Typ der Normalmap-Generierung ("sobel" für Kantenerkennung, "flat" für flache Map)           | "sobel"              |
-| RoughnessInvert      | Boolean        | Roughness invertieren (true/false)                                                          | false                |
-| MetallicIntensity    | Zahl (float)   | Intensität des Metall-Effekts                                                               | 1.0                  |
-| EmissionColor        | Array (float)  | Farbe der Emission (RGB, z.B. [1.0, 1.0, 0.0] für gelb)                                     | [1.0, 1.0, 1.0]      |
-| AlphaMode            | String         | Alpha-Modus ("opaque", "mask", "blend")                                                     | "opaque"             |
-
-### Anpassung
-
-- Öffne die Datei `material.json` mit einem Texteditor.
-- Ändere die Werte nach Bedarf, z.B.:
-
-  - **NormalStrength**  
-    `"NormalStrength": 0.5`  
-    Erhöht die Prägung der Normalmap (Kanten werden stärker hervorgehoben).
-
-  - **RoughnessStrength**  
-    `"RoughnessStrength": 0.8`  
-    Material wirkt rauer, weniger glänzend.
-
-  - **OcclusionStrength**  
-    `"OcclusionStrength": 0.5`  
-    Weniger starke Schatten, Material wirkt heller.
-
-  - **MetallicThreshold**  
-    `"MetallicThreshold": 100`  
-    Bereits hellere Bereiche werden als Metall interpretiert.
-
-  - **EmissionStrength**  
-    `"EmissionStrength": 2.0`  
-    Material leuchtet stärker.
-
-  - **AlphaStrength**  
-    `"AlphaStrength": 0.5`  
-    Material wird halbtransparent.
-
-  - **BaseColorTint**  
-    `"BaseColorTint": [1.0, 0.7, 0.7]`  
-    Material erhält einen rötlichen Farbton.
-
-  - **NormalMapType**  
-    `"NormalMapType": "flat"`  
-    Erzeugt eine flache Normalmap ohne Kantenerkennung.
-
-  - **RoughnessInvert**  
-    `"RoughnessInvert": true`  
-    Invertiert die Rauheit, helle Bereiche werden rau, dunkle glatt.
-
-  - **MetallicIntensity**  
-    `"MetallicIntensity": 0.5`  
-    Metall-Effekt wird abgeschwächt.
-
-  - **EmissionColor**  
-    `"EmissionColor": [1.0, 1.0, 0.0]`  
-    Material leuchtet gelb.
-
-  - **AlphaMode**  
-    `"AlphaMode": "blend"`  
-    Material wird transparent dargestellt.  
-    `"AlphaMode": "mask"` für Maskierung.  
-    `"AlphaMode": "opaque"` für undurchsichtiges Material.
-
-**Hinweis:**  
-Nach dem Speichern der Änderungen die Anwendung neu starten, damit die neuen Einstellungen übernommen werden.
-
-## Lizenz
-
-Dieses Projekt steht unter der MIT-Lizenz.
+Der **PBR Material Maker** ist ein einfach zu bedienendes Tool, um aus Texturen automatisch GLTF-Dateien für PBR-Materialien zu erstellen. Die Anwendung ist für Einsteiger geeignet und bietet eine intuitive Oberfläche mit Drag & Drop Unterstützung.
 
 ---
 
+## Was ist PBR?
+
+**PBR** steht für *Physically Based Rendering*. Dabei werden Materialien so beschrieben, dass sie möglichst realistisch im 3D-Rendering aussehen. Typische Texturarten sind:
+- **Base Color** (Grundfarbe)
+- **Normal** (Oberflächenstruktur)
+- **Occlusion** (Schatten)
+- **Roughness** (Rauheit)
+- **Metallic** (Metallanteil)
+- **Emission** (Selbstleuchten)
+- **Alpha** (Transparenz)
+
+---
+
+## Funktionen im Überblick
+
+### 1. Drag & Drop von Texturen
+- Ziehe JPG- oder PNG-Dateien direkt auf die jeweiligen Felder (z.B. Base Color, Normal, etc.).
+- Die Anwendung erkennt viele gängige Namensmuster aus Engines wie Unreal, Unity, Godot, O3DE, CryEngine, Stride, Flax, Snowdrop und mehr.
+
+### 2. Automatisches Ausfüllen
+- Wird eine Base Color Textur eingefügt, werden passende Texturen für Normal, Occlusion, Roughness, Metallic, Emission und Alpha automatisch gesucht und zugeordnet.
+- Fehlen einzelne Maps, werden sie aus der Base Color generiert.
+
+### 3. Auflösung wählen
+- Wähle eine Zielauflösung für die Texturen (z.B. 2048x2048, 1024x1024, ... oder eigene Werte).
+- Die Texturen werden beim Speichern auf die gewählte Größe skaliert.
+
+### 4. GLTF-Datei erzeugen
+- Mit einem Klick auf **Save** werden alle Texturen und die GLTF-Datei im Unterordner `gltf_textures` gespeichert.
+- Die GLTF-Datei enthält Verweise auf alle erzeugten Texturen.
+
+### 5. Material Presets
+- Über die Materialauswahl können vordefinierte Einstellungen für verschiedene Materialien geladen werden.
+- Die Werte für Normal, Roughness, Occlusion, Metallic, Emission und Alpha werden automatisch angepasst.
+
+### 6. Konfiguration über material.json
+- Die Datei `material.json` erlaubt die Anpassung der Effektstärken und Presets.
+- Beispiel für die wichtigsten Parameter:
+
+| Parameter           | Typ      | Bereich      | Beschreibung                                      |
+|---------------------|----------|-------------|---------------------------------------------------|
+| NormalStrength      | float    | 0.0 - 1.0   | Stärke der Prägung/Normalmap                      |
+| RoughnessStrength   | float    | 0.0 - 1.0   | Stärke der Rauheit                                |
+| OcclusionStrength   | float    | 0.0 - 1.0   | Stärke der Schatten/Occlusion                     |
+| MetallicThreshold   | int      | 0 - 255     | Schwellenwert für Metallisch                      |
+| EmissionStrength    | float    | 0.0 - 1.0   | Stärke der Emission                               |
+| AlphaStrength       | float    | 0.0 - 1.0   | Stärke der Transparenz/Alpha                      |
+| BaseColorTint       | float[3] | 0.0 - 1.0   | Farb-Tint für die Grundfarbe                      |
+| NormalMapType       | string   | "sobel"/... | Typ der Normalmap-Generierung                     |
+| RoughnessInvert     | bool     | true/false  | Rauheit invertieren                               |
+| MetallicIntensity   | float    | 0.0 - 1.0   | Intensität des Metall-Effekts                     |
+| EmissionColor       | float[3] | 0.0 - 1.0   | Farbe für Emission                                |
+| AlphaMode           | string   | "opaque"/...| Modus für Transparenz                             |
+
+---
+
+## Schritt-für-Schritt Anleitung
+
+1. **Textur einfügen:** Ziehe eine Textur (z.B. Base Color) auf das entsprechende Feld.
+2. **Materialname:** Der Name wird automatisch aus dem Dateinamen vorgeschlagen, kann aber angepasst werden.
+3. **Material Preset wählen:** Optional ein Preset auswählen, um die Einstellungen zu übernehmen.
+4. **Auflösung wählen:** Die gewünschte Zielgröße für die Texturen auswählen.
+5. **Speichern:** Klicke auf **Save**, um alle Maps und die GLTF-Datei zu generieren.
+
+---
+
+## Unterstützte Textur-Endungen
+
+Das Tool erkennt automatisch viele gängige Endungen, z.B.:
+- **Normal:** `_normal`, `_nrm`, `_normal-ogl`, `_Normals`, `_normalmap`, ...
+- **Metallic:** `_metallic`, `_metal`, `_metalTex`, ...
+- **Height/Displacement:** `_height`, `_disp`, `_bump`, ...
+- **Occlusion/AO:** `_occlusion`, `_ao`, `_ambientocclusion`, ...
+- **Roughness:** `_roughness`, `_rough`, ...
+- **Emission:** `_emission`, `_emissive`, `_glow`, ...
+- **Alpha/Mask:** `_alpha`, `_opacity`, `_mask`, ...
+
+---
+
+## Hinweise für Einsteiger
+
+- **Mindestens eine Base Color Textur ist erforderlich.**
+- Fehlende Maps werden automatisch aus der Base Color berechnet.
+- Die generierten Dateien findest du im Unterordner `gltf_textures`.
+- Die Anwendung ist für Windows (.NET 10, C# 14.0, WPF) entwickelt.
+
+---
+
+## Lizenz
+
+Siehe [LICENSE](../LICENSE) für weitere Informationen.
+
+---
+
+## Hilfe & Support
+
+Bei Fragen oder Problemen kannst du ein Issue auf GitHub eröffnen oder die Dokumentation im Repository lesen.
