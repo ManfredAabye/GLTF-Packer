@@ -173,12 +173,47 @@ namespace PBR_Material_Maker
         {
             string search_pattern = mat_name + "*" + extension;
             string[] files = Directory.GetFiles(dir, search_pattern);
-            string[] ext_normals = new string[] { "_normal", "_norm", "_nrml", "_nrm", "_nor" };
-            string[] ext_occlusion = new string[] { "_ambient", "_occlusion", "_ao", "_ambientocclusion" };
-            string[] ext_metallic = new string[] { "_metallic", "_metalness", "_mtl", "_metal" };
-            string[] ext_roughness = new string[] { "_roughness", "_rough", "_roug", "_rgh" };
-            string[] ext_emission = new string[] { "_emission", "_emiss", "_emit" };
-            string[] ext_alpha = new string[] { "_alpha", "_transparency" };
+
+            // Standard-Endungen aus verschiedenen Engines inkl. Ergänzungen
+            string[] ext_normals = new string[] {
+                "_normal", "_norm", "_nrml", "_nrm", "_nor",
+                "_n", "_nrm", "_normalmap", "_nm",
+                "_Normals", "_NormalMap",
+                "_nor", "_normals", "_normal_map",
+                "_nmap", "_nml", "_nmlmap",
+                "_nrmTex", "_nrmTexture",
+                "_normal-ogl" // Ergänzung
+            };
+            string[] ext_occlusion = new string[] {
+                "_ambient", "_occlusion", "_ao", "_ambientocclusion",
+                "_Occ", "_Occlusion", "_AO", "_aoTex", "_aoTexture",
+                "_ambient_occlusion", "_occlusionmap", "_occlusion_map"
+            };
+            string[] ext_metallic = new string[] {
+                "_metallic", "_metalness", "_mtl", "_metal",
+                "_Metal", "_Metallic", "_metalTex", "_metalTexture",
+                "_metal_map", "_metallicmap", "_metallic_map"
+            };
+            string[] ext_roughness = new string[] {
+                "_roughness", "_rough", "_roug", "_rgh",
+                "_Rough", "_Roughness", "_roughTex", "_roughTexture",
+                "_rough_map", "_roughnessmap", "_roughness_map"
+            };
+            string[] ext_emission = new string[] {
+                "_emission", "_emiss", "_emit",
+                "_Emissive", "_Emiss", "_emissiveTex", "_emissiveTexture",
+                "_emissive_map", "_emissionmap", "_emission_map",
+                "_Glow", "_glow", "_illum", "_illumination"
+            };
+            string[] ext_alpha = new string[] {
+                "_alpha", "_transparency",
+                "_Opacity", "_opacity", "_mask", "_Mask", "_transTex", "_transTexture",
+                "_alpha_map", "_alphamap", "_alphaMap"
+            };
+            string[] ext_height = new string[] {
+                "_height", "_Height", "_disp", "_displacement", "_bump", "_bumpmap"
+            };
+
             foreach (string file in files)
             {
                 if (EndsWithAnyCaseInsensitive(Path.GetFileNameWithoutExtension(file), ext_normals)) { pictureBoxNormal.ImageLocation = file; continue; }
@@ -187,7 +222,7 @@ namespace PBR_Material_Maker
                 if (EndsWithAnyCaseInsensitive(Path.GetFileNameWithoutExtension(file), ext_roughness)) { pictureBoxRoughness.ImageLocation = file; continue; }
                 if (EndsWithAnyCaseInsensitive(Path.GetFileNameWithoutExtension(file), ext_emission)) { pictureBoxEmission.ImageLocation = file; continue; }
                 if (EndsWithAnyCaseInsensitive(Path.GetFileNameWithoutExtension(file), ext_alpha)) { pictureBoxAlpha.ImageLocation = file; continue; }
-
+                if (EndsWithAnyCaseInsensitive(Path.GetFileNameWithoutExtension(file), ext_height)) { /* Hier können Sie z.B. ein PictureBox für Height/Displacement zuweisen */ continue; }
             }
         }
 
