@@ -1,4 +1,4 @@
-# PBR Material Maker
+# PBR Material Maker - GLTF-Packer
 
 Der **PBR Material Maker** ist ein einfach zu bedienendes Tool, um aus Texturen automatisch GLTF-Dateien für PBR-Materialien zu erstellen. Die Anwendung ist für Einsteiger geeignet und bietet eine intuitive Oberfläche mit Drag & Drop Unterstützung.
 
@@ -101,3 +101,4 @@ Siehe [LICENSE](../LICENSE) für weitere Informationen.
 ## Hilfe & Support
 
 Bei Fragen oder Problemen kannst du ein Issue auf GitHub eröffnen oder die Dokumentation im Repository lesen.
+
